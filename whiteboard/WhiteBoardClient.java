@@ -1,11 +1,15 @@
 package whiteboard;
 
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+
+import whiteboard.packet.Packet;
 
 public class WhiteBoardClient {
 	
@@ -47,6 +51,14 @@ public class WhiteBoardClient {
 			System.out.println("Exception with I/O.");
 			System.exit(-1);
 		}
+	}
+	
+	public void sendCommandPacket(Packet p) {
+		
+	}
+	
+	public ArrayList<Packet> getCommandPackets() {
+		return new ArrayList<Packet>();
 	}
 	
 	public void sendMessage(String message) {
