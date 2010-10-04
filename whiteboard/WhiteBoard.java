@@ -29,6 +29,8 @@ public class WhiteBoard {
   private JRadioButton eraseButton;
   private DrawingPanel drawingPanel;
   
+  private final Dimension drawingPanelSize = new Dimension(640, 640);
+  
   private int radius = 3;
   public int getRadius() {
     return radius;
@@ -52,23 +54,34 @@ public class WhiteBoard {
   public void run() {
     frame = new JFrame();
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    frame.setSize(640, 640);
-    frame.setResizable(false);
     
     JPanel controlPanel = new JPanel();
     controlPanel.setLayout(new BoxLayout(controlPanel, BoxLayout.X_AXIS));
     frame.getContentPane().add(controlPanel, BorderLayout.NORTH);
     
     drawingPanel = new DrawingPanel(this);
+    drawingPanel.setPreferredSize(drawingPanelSize);
     frame.getContentPane().add(drawingPanel, BorderLayout.CENTER);
     
     controlPanel.add(Box.createHorizontalGlue());
     
     drawButton = new JRadioButton("Draw");
     drawButton.setSelected(true);
+    drawButton.addActionListener(new ActionListener() {
+      @Override public void actionPerformed(ActionEvent e) {
+        isDrawing = true;
+        isErasing = false;
+      }
+    });
     controlPanel.add(drawButton);
     
     eraseButton = new JRadioButton("Erase");
+    eraseButton.addActionListener(new ActionListener() {
+      @Override public void actionPerformed(ActionEvent e) {
+        isDrawing = false;
+        isErasing = true;
+      }
+    });
     controlPanel.add(eraseButton);
     
     ButtonGroup drawingRadioGroup = new ButtonGroup();
@@ -105,6 +118,11 @@ public class WhiteBoard {
     controlPanel.add(brushSizeSlider);
     
     JButton clearButton = new JButton("Clear");
+    clearButton.addActionListener(new ActionListener() {
+      @Override public void actionPerformed(ActionEvent e) {
+        drawingPanel.clearImage();
+      }
+    });
     controlPanel.add(clearButton);
     
     JButton historyButton = new JButton("Replay");
@@ -112,6 +130,8 @@ public class WhiteBoard {
     
     controlPanel.add(Box.createHorizontalGlue());
     
+    frame.pack();
+    frame.setResizable(false);
     frame.setVisible(true);
   }
   
