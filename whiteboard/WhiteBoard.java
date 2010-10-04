@@ -18,12 +18,37 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JSlider;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 public class WhiteBoard {
-  private JFrame frame;
-  private Color drawingColor = Color.BLACK; 
+  private JFrame frame; 
   private JButton colorPickerButton;
+  private JSlider brushSizeSlider;
+  private JRadioButton drawButton;
+  private JRadioButton eraseButton;
+  private DrawingPanel drawingPanel;
   
+  private int radius = 3;
+  public int getRadius() {
+    return radius;
+  }
+  
+  private boolean isDrawing = true;
+  public boolean isDrawing() { 
+    return isDrawing;
+  }
+  
+  private boolean isErasing = false;
+  public boolean isErasing() {
+    return isErasing;
+  }
+
+  private Color drawingColor = Color.BLACK;
+  public Color getDrawingColor() {
+    return drawingColor;
+  }
+ 
   public void run() {
     frame = new JFrame();
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -33,13 +58,17 @@ public class WhiteBoard {
     JPanel controlPanel = new JPanel();
     controlPanel.setLayout(new BoxLayout(controlPanel, BoxLayout.X_AXIS));
     frame.getContentPane().add(controlPanel, BorderLayout.NORTH);
+    
+    drawingPanel = new DrawingPanel(this);
+    frame.getContentPane().add(drawingPanel, BorderLayout.CENTER);
+    
     controlPanel.add(Box.createHorizontalGlue());
     
-    JRadioButton drawButton = new JRadioButton("Draw");
+    drawButton = new JRadioButton("Draw");
     drawButton.setSelected(true);
     controlPanel.add(drawButton);
     
-    JRadioButton eraseButton = new JRadioButton("Erase");
+    eraseButton = new JRadioButton("Erase");
     controlPanel.add(eraseButton);
     
     ButtonGroup drawingRadioGroup = new ButtonGroup();
@@ -66,8 +95,13 @@ public class WhiteBoard {
     colorPickerButton.setFocusPainted(false);
     controlPanel.add(colorPickerButton);
     
-    JSlider brushSizeSlider = new JSlider(JSlider.HORIZONTAL, 3, 30, 3);
+    brushSizeSlider = new JSlider(JSlider.HORIZONTAL, 3, 30, 3);
     brushSizeSlider.setMaximumSize(new Dimension(128, 48));
+    brushSizeSlider.addChangeListener(new ChangeListener() {
+      @Override public void stateChanged(ChangeEvent e) {
+        radius = brushSizeSlider.getValue();
+      }
+    });
     controlPanel.add(brushSizeSlider);
     
     JButton clearButton = new JButton("Clear");
@@ -77,9 +111,6 @@ public class WhiteBoard {
     controlPanel.add(historyButton);
     
     controlPanel.add(Box.createHorizontalGlue());
-    
-    DrawingPanel drawingPanel = new DrawingPanel();
-    frame.getContentPane().add(drawingPanel, BorderLayout.CENTER);
     
     frame.setVisible(true);
   }
