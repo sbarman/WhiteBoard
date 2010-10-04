@@ -1,26 +1,18 @@
 package whiteboard.packet;
 
+import java.awt.Color;
+
 public class ChangeBrushColorPacket extends Packet {
 	
 	private static final long serialVersionUID = -8305167280872469059L;
 
-	private int h, s, b;
+	private Color color;
 	
-	public ChangeBrushColorPacket(int h, int s, int b) {
-		this.h = h;
-		this.s = s;
-		this.b = b;
+	public ChangeBrushColorPacket(Color color) {
+		this.color = color;
 	}
 	
-	public int getHue() {
-		return h;
-	}
-	
-	public int getSat() {
-		return s;
-	}
-	
-	public int getBright() {
-		return b;
+	public Color getColor() {
+		return color;
 	}
 }

@@ -38,13 +38,16 @@ public class WhiteBoardServer {
 
 		while (true) {
 			Socket clientSocket = null;
-			
+			int numConnections = 0;
 			try {
 				clientSocket = serverSocket.accept();
 				System.out.println("New client: " + clientSocket.getPort());
 				WhiteBoardServerThread thread = new WhiteBoardServerThread(
-						this, clientSocket, openConnections.size());
-				openConnections.add(thread);
+						this, clientSocket, numConnections);
+				numConnections++;
+				synchronized(openConnections) {
+					openConnections.add(thread);
+				}
 				thread.start();
 			} catch (IOException e) {
 				System.out.println("Accept failed: " + port);
@@ -59,8 +62,16 @@ public class WhiteBoardServer {
 			packets.add(newPacket);
 		}
 		
-		for(WhiteBoardServerThread openConnection : openConnections) {
-			openConnection.send(newPacket);
+		synchronized(openConnections) {
+			for(WhiteBoardServerThread openConnection : openConnections) {
+				openConnection.send(newPacket);
+			}
+		}
+	}
+
+	public void removeConnection(WhiteBoardServerThread thread) {
+		synchronized(openConnections) {
+			openConnections.remove(thread);
 		}
 	}
 }

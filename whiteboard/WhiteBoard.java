@@ -21,6 +21,10 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import whiteboard.packet.ChangeBrushColorPacket;
+import whiteboard.packet.ChangeBrushSizePacket;
+import whiteboard.packet.ClearScreenPacket;
+
 public class WhiteBoard {
   private JFrame frame; 
   private JButton colorPickerButton;
@@ -46,9 +50,18 @@ public class WhiteBoard {
     return isErasing;
   }
 
-  private Color drawingColor = Color.BLACK;
+  private Color drawingColor = Color.BLACK;  
   public Color getDrawingColor() {
     return drawingColor;
+  }
+  
+  private WhiteBoardClient client;
+  public WhiteBoardClient getClient() {
+	  return client;
+  }
+  
+  public WhiteBoard() {
+	  this.client = new WhiteBoardClient();
   }
  
   public void run() {
@@ -98,9 +111,11 @@ public class WhiteBoard {
     });
     colorPickerButton.addActionListener(new ActionListener() {
       @Override public void actionPerformed(ActionEvent e) {
-        drawingColor = JColorChooser.showDialog(frame,
-                                                "Pick a color",
-                                                drawingColor);
+		client.sendCommandPacket(new ChangeBrushColorPacket(
+			JColorChooser.showDialog(frame, "Pick a color",drawingColor)));
+				// drawingColor = JColorChooser.showDialog(frame,
+//                                                "Pick a color",
+//                                                drawingColor);
       }
     });
     colorPickerButton.putClientProperty("JButton.buttonType", "square");
@@ -112,7 +127,8 @@ public class WhiteBoard {
     brushSizeSlider.setMaximumSize(new Dimension(128, 48));
     brushSizeSlider.addChangeListener(new ChangeListener() {
       @Override public void stateChanged(ChangeEvent e) {
-        radius = brushSizeSlider.getValue();
+    	client.sendCommandPacket(new ChangeBrushSizePacket(brushSizeSlider.getValue()));
+    	//radius = brushSizeSlider.getValue();
       }
     });
     controlPanel.add(brushSizeSlider);
@@ -120,7 +136,8 @@ public class WhiteBoard {
     JButton clearButton = new JButton("Clear");
     clearButton.addActionListener(new ActionListener() {
       @Override public void actionPerformed(ActionEvent e) {
-        drawingPanel.clearImage();
+    	client.sendCommandPacket(new ClearScreenPacket());
+      //  drawingPanel.clearImage();
       }
     });
     controlPanel.add(clearButton);
@@ -133,6 +150,7 @@ public class WhiteBoard {
     frame.pack();
     frame.setResizable(false);
     frame.setVisible(true);
+    client.initListener(this, drawingPanel);
   }
   
   public static void main(String[] args) {

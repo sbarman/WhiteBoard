@@ -46,10 +46,12 @@ public class WhiteBoardServerThread extends Thread {
 				}
 			} catch (IOException e) {
 				System.out.println("Exception when listening for packets.");
+				break;
 			} catch (ClassNotFoundException e) {
 				System.out.println("Exception when listening for packets.");
 			}
 		}
+		server.removeConnection(this);
 		System.out.println("Thread finished");
 	}
 

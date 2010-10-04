@@ -43,9 +43,6 @@ public class WhiteBoardClient {
 			output = new ObjectOutputStream(socket.getOutputStream());
 			input = new ObjectInputStream(socket.getInputStream());
 			this.clientId = input.readInt();
-			
-			listener = new WhiteBoardClientListener(input);
-			listener.start();
 		} catch (UnknownHostException e) {
 			System.out.println("Unable to find host.");
 			System.exit(-1);
@@ -53,6 +50,10 @@ public class WhiteBoardClient {
 			System.out.println("Exception with I/O.");
 			System.exit(-1);
 		}
+	}
+	
+	public int getClientId() {
+		return clientId;
 	}
 	
 	public void sendCommandPacket(Packet p) {
@@ -68,5 +69,10 @@ public class WhiteBoardClient {
 	public ArrayList<Packet> getCommandPackets() {
 		ArrayList<Packet> availablePackets = listener.getNewPackets();
 		return availablePackets;
+	}
+	
+	public void initListener(WhiteBoard board, DrawingPanel panel) {
+		listener = new WhiteBoardClientListener(input, board, panel);
+		listener.start();
 	}
 };
