@@ -3,7 +3,10 @@ package whiteboard;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Vector;
+
+import whiteboard.packet.Packet;
 
 public class WhiteBoardServer {
 
@@ -15,11 +18,13 @@ public class WhiteBoardServer {
 	}
 
 	private int port;
-	private Vector<WhiteBoardServerThread> openSockets;
+	private Vector<WhiteBoardServerThread> openConnections;
+	private ArrayList<Packet> packets;
 
 	public WhiteBoardServer(int port) {
 		this.port = port;
-		openSockets = new Vector<WhiteBoardServerThread>();
+		openConnections = new Vector<WhiteBoardServerThread>();
+		packets = new ArrayList<Packet>();
 	}
 
 	private void start() {
@@ -33,12 +38,13 @@ public class WhiteBoardServer {
 
 		while (true) {
 			Socket clientSocket = null;
+			
 			try {
 				clientSocket = serverSocket.accept();
 				System.out.println("New client: " + clientSocket.getPort());
 				WhiteBoardServerThread thread = new WhiteBoardServerThread(
-						this, clientSocket);
-				openSockets.add(thread);
+						this, clientSocket, openConnections.size());
+				openConnections.add(thread);
 				thread.start();
 			} catch (IOException e) {
 				System.out.println("Accept failed: " + port);
@@ -47,9 +53,14 @@ public class WhiteBoardServer {
 		}
 	}
 	
-	public void broadcast(String newInput) {
-		for(WhiteBoardServerThread openSocket : openSockets) {
-			openSocket.send(newInput);
+	public void broadcast(Packet newPacket) {
+		synchronized(packets) {
+			newPacket.setSeqNum(packets.size());
+			packets.add(newPacket);
+		}
+		
+		for(WhiteBoardServerThread openConnection : openConnections) {
+			openConnection.send(newPacket);
 		}
 	}
 }
