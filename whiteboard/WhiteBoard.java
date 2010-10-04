@@ -26,6 +26,10 @@ import whiteboard.packet.ChangeBrushSizePacket;
 import whiteboard.packet.ClearScreenPacket;
 
 public class WhiteBoard {
+
+  public static final int DEFAULT_RADIUS = 3;
+  public static final Color DEFAULT_COLOR = Color.BLACK;
+	
   private JFrame frame; 
   private JButton colorPickerButton;
   private JSlider brushSizeSlider;
@@ -35,7 +39,7 @@ public class WhiteBoard {
   
   private final Dimension drawingPanelSize = new Dimension(640, 640);
   
-  private int radius = 3;
+  private int radius = DEFAULT_RADIUS;
   public int getRadius() {
     return radius;
   }
@@ -50,7 +54,7 @@ public class WhiteBoard {
     return isErasing;
   }
 
-  private Color drawingColor = Color.BLACK;  
+  private Color drawingColor = DEFAULT_COLOR;  
   public Color getDrawingColor() {
     return drawingColor;
   }
@@ -112,11 +116,9 @@ public class WhiteBoard {
     colorPickerButton.addActionListener(new ActionListener() {
       @Override public void actionPerformed(ActionEvent e) {
 		client.sendCommandPacket(new ChangeBrushColorPacket(
-			JColorChooser.showDialog(frame, "Pick a color",drawingColor)));
-				// drawingColor = JColorChooser.showDialog(frame,
-//                                                "Pick a color",
-//                                                drawingColor);
-      }
+			drawingColor = JColorChooser.showDialog(frame, "Pick a color",drawingColor)));
+			client.sendCommandPacket(new ChangeBrushColorPacket(drawingColor));
+      	}
     });
     colorPickerButton.putClientProperty("JButton.buttonType", "square");
     colorPickerButton.setSize(new Dimension(24, 12));
@@ -127,8 +129,8 @@ public class WhiteBoard {
     brushSizeSlider.setMaximumSize(new Dimension(128, 48));
     brushSizeSlider.addChangeListener(new ChangeListener() {
       @Override public void stateChanged(ChangeEvent e) {
-    	client.sendCommandPacket(new ChangeBrushSizePacket(brushSizeSlider.getValue()));
-    	//radius = brushSizeSlider.getValue();
+      	radius = brushSizeSlider.getValue();
+    	client.sendCommandPacket(new ChangeBrushSizePacket(radius));
       }
     });
     controlPanel.add(brushSizeSlider);

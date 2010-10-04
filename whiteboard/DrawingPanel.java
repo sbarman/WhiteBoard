@@ -67,7 +67,7 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
     drawingNotErasing = false;
   }
   
-  private void drawAtPoint(Point p) {
+  private void sendDrawPacket(Point p) {
 //    int radius = whiteboard.getRadius();
     
 //    if (whiteboard.isDrawing()) {
@@ -89,27 +89,34 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
     lastPoint = p;
     this.repaint();
   }
-  
+    
   public void drawPoint(int x, int y, Color c, int radius) {
 	  imageG2d.setColor(c);
 	  imageG2d.fillOval(x - radius, y - radius, radius * 2, radius * 2);    
   }
   
+  public void drawLine(Point p1, Point p2, Color c, int radius) {
+    imageG2d.setColor(c);
+    Shape line = new Line2D.Double(p1, p2);
+    imageG2d.setStroke(new BasicStroke(radius * 2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+    imageG2d.draw(line);
+	  
+  }
+  
   @Override public void mouseClicked(MouseEvent e) {}
   @Override public void mouseEntered(MouseEvent e) {}
   @Override public void mouseExited(MouseEvent e) {
-    drawAtPoint(e.getPoint());
     lastPoint = null;
   }
   @Override public void mousePressed(MouseEvent e) {
-    this.drawAtPoint(e.getPoint());
+    this.sendDrawPacket(e.getPoint());
   }
   @Override public void mouseReleased(MouseEvent e) {
     lastPoint = null;
   }
 
   @Override public void mouseDragged(MouseEvent e) {
-    this.drawAtPoint(e.getPoint());
+    this.sendDrawPacket(e.getPoint());
   }
   
   @Override public void mouseMoved(MouseEvent e) {

@@ -13,4 +13,8 @@ public class ChangeBrushSizePacket extends Packet {
 	public int getSize() {
 		return size;
 	}
+	
+	public String toString() {
+		return "(" + seqNum + "," + screenId + ") Size: " + size;
+	}
 }

@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import whiteboard.packet.ChangeBrushColorPacket;
 import whiteboard.packet.ChangeBrushSizePacket;
@@ -20,6 +21,33 @@ public class WhiteBoardClientListener extends Thread {
 	private WhiteBoard board;
 	private DrawingPanel panel;
 	
+	// Stores the current state of each client seen
+	private HashMap<Integer, WhiteBoardState> clientStates;
+	
+	class WhiteBoardState {
+		int brushSize;
+		Color color;
+		
+		public WhiteBoardState() {
+			brushSize = WhiteBoard.DEFAULT_RADIUS;
+			color = WhiteBoard.DEFAULT_COLOR;
+		}
+		
+		@Override
+		public boolean equals(Object o) {
+			if (o instanceof WhiteBoardState) { 
+				WhiteBoardState other = (WhiteBoardState) o;
+				return color.equals(other.color) && brushSize == other.brushSize;
+			}
+			return false;
+		}
+		
+		@Override
+		public int hashCode() {
+			return color.hashCode() + brushSize;
+		}
+	}
+	
 	
 	public WhiteBoardClientListener(ObjectInputStream input, WhiteBoard board,
 			DrawingPanel panel) {
@@ -27,6 +55,7 @@ public class WhiteBoardClientListener extends Thread {
 		this.board = board;
 		this.panel = panel;
 		newPackets = new ArrayList<Packet>();
+		clientStates = new HashMap<Integer, WhiteBoardState>();
 	}
 	
 	public void run() {
@@ -53,20 +82,36 @@ public class WhiteBoardClientListener extends Thread {
 	}
 	
 	private void handlePacket(Packet packet) {
+		int id = packet.getScreenId();
+		if (!clientStates.containsKey(packet.getScreenId())) {
+			clientStates.put(id, new WhiteBoardState());
+		}
+		
 		if(packet instanceof ChangeBrushColorPacket) {
-			
+			clientStates.get(id).color = ((ChangeBrushColorPacket) packet).getColor();
 		} else if(packet instanceof ChangeBrushSizePacket) {
-			
+			clientStates.get(id).brushSize = ((ChangeBrushSizePacket) packet).getSize();	
 		} else if(packet instanceof ClearScreenPacket) {
-			
+			panel.clearImage();
 		} else if(packet instanceof CursorMovedPacket) {
 			CursorMovedPacket cmp = (CursorMovedPacket) packet;
-			panel.drawPoint(cmp.getX(), cmp.getY(), Color.BLACK, 5);
+			panel.drawPoint(cmp.getX(), cmp.getY(), clientStates.get(id).color,
+					clientStates.get(id).brushSize);
 			panel.repaint();
 		} else if(packet instanceof DrawImagePacket) {
 			
 		} else if(packet instanceof DrawLinePacket) {
-			
+			DrawLinePacket dlp = (DrawLinePacket) packet;
+			Color color;
+			if (dlp.getErasing()) {
+				color = Color.WHITE;
+			} else {
+				System.out.println(clientStates.containsKey(id));
+				color = clientStates.get(id).color;
+			}
+			System.out.println(color);
+			panel.drawLine(dlp.getStartPoint(), dlp.getEndPoint(), color,
+					clientStates.get(id).brushSize);
 		} else {
 			System.out.println("Unknown packet");
 		}

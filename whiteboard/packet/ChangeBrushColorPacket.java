@@ -15,4 +15,8 @@ public class ChangeBrushColorPacket extends Packet {
 	public Color getColor() {
 		return color;
 	}
+	
+	public String toString() {
+		return "(" + seqNum + "," + screenId + ") Color: " + color;
+	}
 }
