@@ -115,10 +115,9 @@ public class WhiteBoard {
     });
     colorPickerButton.addActionListener(new ActionListener() {
       @Override public void actionPerformed(ActionEvent e) {
-		client.sendCommandPacket(new ChangeBrushColorPacket(
-			drawingColor = JColorChooser.showDialog(frame, "Pick a color",drawingColor)));
-			client.sendCommandPacket(new ChangeBrushColorPacket(drawingColor));
-      	}
+        drawingColor = JColorChooser.showDialog(frame, "Pick a color", drawingColor);    
+        client.sendCommandPacket(new ChangeBrushColorPacket(drawingColor));
+      }
     });
     colorPickerButton.putClientProperty("JButton.buttonType", "square");
     colorPickerButton.setSize(new Dimension(24, 12));
