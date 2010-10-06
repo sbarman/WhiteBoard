@@ -145,6 +145,15 @@ public class WhiteBoard {
     controlPanel.add(clearButton);
     
     JButton historyButton = new JButton("Replay");
+    historyButton.addActionListener(new ActionListener() {
+        @Override public void actionPerformed(ActionEvent e) {
+        	JFrame replayFrame = new JFrame();
+            
+            DrawingPanel replayDrawingPanel = new DrawingPanel(null);
+            replayDrawingPanel.setPreferredSize(drawingPanelSize);
+            replayFrame.getContentPane().add(replayDrawingPanel, BorderLayout.CENTER);
+        }
+      });
     controlPanel.add(historyButton);
     
     controlPanel.add(Box.createHorizontalGlue());

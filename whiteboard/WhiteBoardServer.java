@@ -36,9 +36,10 @@ public class WhiteBoardServer {
 			System.exit(-1);
 		}
 
+		int numConnections = 0;
+		
 		while (true) {
 			Socket clientSocket = null;
-			int numConnections = 0;
 			try {
 				clientSocket = serverSocket.accept();
 				System.out.println("New client: " + clientSocket.getPort());

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Vector;
 
 import whiteboard.packet.ChangeBrushColorPacket;
 import whiteboard.packet.ChangeBrushSizePacket;
@@ -17,9 +18,8 @@ import whiteboard.packet.Packet;
 public class WhiteBoardClientListener extends Thread {
 	
 	private ObjectInputStream input;
-	private ArrayList<Packet> newPackets;
-	private WhiteBoard board;
 	private DrawingPanel panel;
+	private Vector<Packet> packetHistory;
 	
 	// Stores the current state of each client seen
 	private HashMap<Integer, WhiteBoardState> clientStates;
@@ -49,12 +49,11 @@ public class WhiteBoardClientListener extends Thread {
 	}
 	
 	
-	public WhiteBoardClientListener(ObjectInputStream input, WhiteBoard board,
+	public WhiteBoardClientListener(ObjectInputStream input,
 			DrawingPanel panel) {
 		this.input = input;
-		this.board = board;
 		this.panel = panel;
-		newPackets = new ArrayList<Packet>();
+		packetHistory = new Vector<Packet>();
 		clientStates = new HashMap<Integer, WhiteBoardState>();
 	}
 	
@@ -64,12 +63,10 @@ public class WhiteBoardClientListener extends Thread {
 			try {
 				Object o = input.readObject();
 				if (o instanceof Packet) {
-					synchronized(newPackets) {
-						System.out.println("Received new packet:" + o);
-						Packet packet = (Packet) o;
-						newPackets.add(packet);
-						handlePacket(packet);
-					}
+					System.out.println("Received new packet:" + o);
+					Packet packet = (Packet) o;
+					handlePacket(packet);
+					packetHistory.add(packet);
 				}
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -79,6 +76,10 @@ public class WhiteBoardClientListener extends Thread {
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	public Vector<Packet> getPacketHistory() {
+		return new Vector<Packet>(packetHistory);
 	}
 	
 	private void handlePacket(Packet packet) {
@@ -116,14 +117,4 @@ public class WhiteBoardClientListener extends Thread {
 			System.out.println("Unknown packet");
 		}
 	}
-
-	public ArrayList<Packet> getNewPackets() {
-		ArrayList<Packet> returnList;
-		synchronized(newPackets) {
-			returnList = new ArrayList<Packet>(newPackets);
-			newPackets.clear();
-		}
-		return returnList;
-	}
-
 }
