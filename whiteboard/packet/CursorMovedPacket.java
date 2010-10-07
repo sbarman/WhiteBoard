@@ -1,22 +1,19 @@
 package whiteboard.packet;
 
+import java.awt.Point;
+
 public class CursorMovedPacket extends Packet {
 	
 	private static final long serialVersionUID = -2960079927906087523L;
 
-	private int x, y;
+	private Point p;
 	
-	public CursorMovedPacket(int x, int y) {
-		this.x = x;
-		this.y = y;
+	public CursorMovedPacket(Point p) {
+		this.p = p;
 	}
 	
-	public int getX() {
-		return x;
+	public Point getPoint() {
+		return p;
 	}
-	
-	public int getY() {
-		return y;
-	}
-	
+		
 }

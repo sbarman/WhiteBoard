@@ -59,7 +59,7 @@ public class WhiteBoardClient {
 	}
 	
 	public void initListener(WhiteBoard board, DrawingPanel panel) {
-		listener = new WhiteBoardClientListener(input, panel);
+		listener = new WhiteBoardClientListener(input, panel, clientId);
 		listener.start();
 	}
 	

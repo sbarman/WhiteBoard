@@ -23,6 +23,7 @@ public class WhiteBoardClientListener extends Thread {
 	
 	// Stores the current state of each client seen
 	private HashMap<Integer, WhiteBoardState> clientStates;
+  private int clientId;
 	
 	class WhiteBoardState {
 		int brushSize;
@@ -50,9 +51,10 @@ public class WhiteBoardClientListener extends Thread {
 	
 	
 	public WhiteBoardClientListener(ObjectInputStream input,
-			DrawingPanel panel) {
+			DrawingPanel panel, int clientId) {
 		this.input = input;
 		this.panel = panel;
+		this.clientId = clientId;
 		packetHistory = new Vector<Packet>();
 		clientStates = new HashMap<Integer, WhiteBoardState>();
 	}
@@ -96,9 +98,10 @@ public class WhiteBoardClientListener extends Thread {
 			panel.clearImage();
 		} else if(packet instanceof CursorMovedPacket) {
 			CursorMovedPacket cmp = (CursorMovedPacket) packet;
-			panel.drawPoint(cmp.getX(), cmp.getY(), clientStates.get(id).color,
-					clientStates.get(id).brushSize);
-			panel.repaint();
+			if (packet.getScreenId() != clientId) {
+			  panel.setRemoteCursor(cmp.getPoint());
+			  panel.repaint();
+			}
 		} else if(packet instanceof DrawImagePacket) {
 			
 		} else if(packet instanceof DrawLinePacket) {
@@ -113,6 +116,10 @@ public class WhiteBoardClientListener extends Thread {
 			System.out.println(color);
 			panel.drawLine(dlp.getStartPoint(), dlp.getEndPoint(), color,
 					clientStates.get(id).brushSize);
+			if (dlp.getScreenId() != clientId) {
+			  panel.setRemoteCursor(dlp.getEndPoint());
+			}
+			panel.repaint();
 		} else {
 			System.out.println("Unknown packet");
 		}

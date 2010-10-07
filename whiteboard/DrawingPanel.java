@@ -2,7 +2,6 @@ package whiteboard;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -22,6 +21,9 @@ import whiteboard.packet.DrawLinePacket;
 public class DrawingPanel extends JPanel implements MouseListener, MouseMotionListener {
   private static final long serialVersionUID = 270375503236272626L;
 
+  private static final Color REMOTE_CURSOR_COLOR = new Color(0.f, 0.f, 0.f, 0.3f);
+  private static final int REMOTE_CURSOR_RADIUS = 10;
+  
   private BufferedImage image;
   private Graphics2D imageG2d;
   boolean drawingNotErasing = true;
@@ -30,6 +32,8 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
   private WhiteBoardClient client;
   
   private Point lastPoint;
+  
+  private Point remoteCursor;
   
   public DrawingPanel(WhiteBoard wb) {
     whiteboard = wb;
@@ -51,7 +55,17 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
   public void paintComponent(Graphics g) {
     if (image == null) resetImage();
     Graphics2D g2d = (Graphics2D) g;
+    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     g2d.drawImage(image, 0, 0, this.getWidth(), this.getHeight(), null);
+    
+    // Draw the remote cursor
+    if (remoteCursor != null) {
+      g2d.setColor(REMOTE_CURSOR_COLOR);
+      g2d.fillOval(remoteCursor.x - REMOTE_CURSOR_RADIUS, 
+                   remoteCursor.y - REMOTE_CURSOR_RADIUS, 
+                   REMOTE_CURSOR_RADIUS * 2, 
+                   REMOTE_CURSOR_RADIUS * 2);
+    }
   }
   
   public void clearImage() {
@@ -65,6 +79,10 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
   
   public void setIsErasing() {
     drawingNotErasing = false;
+  }
+  
+  public void setRemoteCursor(Point p) {
+    remoteCursor = p;
   }
   
   private void sendDrawPacket(Point p) {
@@ -100,12 +118,16 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
     Shape line = new Line2D.Double(p1, p2);
     imageG2d.setStroke(new BasicStroke(radius * 2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
     imageG2d.draw(line);
-	  
   }
   
   @Override public void mouseClicked(MouseEvent e) {}
   @Override public void mouseEntered(MouseEvent e) {}
   @Override public void mouseExited(MouseEvent e) {
+    if (lastPoint != null) {
+      this.sendDrawPacket(e.getPoint());
+    } else {
+      client.sendCommandPacket(new CursorMovedPacket(null));
+    }
     lastPoint = null;
   }
   @Override public void mousePressed(MouseEvent e) {
@@ -120,6 +142,6 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
   }
   
   @Override public void mouseMoved(MouseEvent e) {
-	  client.sendCommandPacket(new CursorMovedPacket(e.getX(), e.getY()));
+	  client.sendCommandPacket(new CursorMovedPacket(e.getPoint()));
   }
 }
