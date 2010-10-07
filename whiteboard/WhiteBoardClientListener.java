@@ -99,7 +99,7 @@ public class WhiteBoardClientListener extends Thread {
 		} else if(packet instanceof CursorMovedPacket) {
 			CursorMovedPacket cmp = (CursorMovedPacket) packet;
 			if (packet.getScreenId() != clientId) {
-			  panel.setRemoteCursor(cmp.getPoint());
+			  panel.setRemoteCursor(cmp.getPoint(), clientStates.get(id).brushSize);
 			  panel.repaint();
 			}
 		} else if(packet instanceof DrawImagePacket) {
@@ -117,7 +117,7 @@ public class WhiteBoardClientListener extends Thread {
 			panel.drawLine(dlp.getStartPoint(), dlp.getEndPoint(), color,
 					clientStates.get(id).brushSize);
 			if (dlp.getScreenId() != clientId) {
-			  panel.setRemoteCursor(dlp.getEndPoint());
+			  panel.setRemoteCursor(dlp.getEndPoint(), clientStates.get(id).brushSize);
 			}
 			panel.repaint();
 		} else {

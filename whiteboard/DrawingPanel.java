@@ -22,7 +22,7 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
   private static final long serialVersionUID = 270375503236272626L;
 
   private static final Color REMOTE_CURSOR_COLOR = new Color(0.f, 0.f, 0.f, 0.3f);
-  private static final int REMOTE_CURSOR_RADIUS = 10;
+  private int remoteCursorRadius = WhiteBoard.DEFAULT_RADIUS;
   
   private BufferedImage image;
   private Graphics2D imageG2d;
@@ -61,10 +61,10 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
     // Draw the remote cursor
     if (remoteCursor != null) {
       g2d.setColor(REMOTE_CURSOR_COLOR);
-      g2d.fillOval(remoteCursor.x - REMOTE_CURSOR_RADIUS, 
-                   remoteCursor.y - REMOTE_CURSOR_RADIUS, 
-                   REMOTE_CURSOR_RADIUS * 2, 
-                   REMOTE_CURSOR_RADIUS * 2);
+      g2d.fillOval(remoteCursor.x - remoteCursorRadius, 
+                   remoteCursor.y - remoteCursorRadius, 
+                   remoteCursorRadius * 2, 
+                   remoteCursorRadius * 2);
     }
   }
   
@@ -81,8 +81,9 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
     drawingNotErasing = false;
   }
   
-  public void setRemoteCursor(Point p) {
+  public void setRemoteCursor(Point p, int r) {
     remoteCursor = p;
+    remoteCursorRadius = r;
   }
   
   private void sendDrawPacket(Point p) {
