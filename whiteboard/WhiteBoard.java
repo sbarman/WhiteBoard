@@ -101,8 +101,6 @@ public class WhiteBoard {
     textPanel.setLayout(new BoxLayout(textPanel, BoxLayout.Y_AXIS));
     frame.getContentPane().add(textPanel, BorderLayout.SOUTH);
     
-    // textPanel.add(new JSeparator(SwingConstants.HORIZONTAL));
-    
     messageLog = new JTextArea();
     messageLog.setRows(6);
     messageLog.setEditable(false);
