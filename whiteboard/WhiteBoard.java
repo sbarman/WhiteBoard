@@ -37,10 +37,12 @@ import whiteboard.packet.DrawImagePacket;
 import whiteboard.packet.TextMessagePacket;
 
 public class WhiteBoard {
-
   public static final int DEFAULT_RADIUS = 3;
   public static final Color DEFAULT_COLOR = Color.BLACK;
 	
+  public static final int MIN_RADIUS = 1;
+  public static final int MAX_RADIUS = 50;
+  
   private JFrame frame; 
   private JButton colorPickerButton;
   private JSlider brushSizeSlider;
@@ -165,7 +167,7 @@ public class WhiteBoard {
     colorPickerButton.setFocusPainted(false);
     controlPanel.add(colorPickerButton);
     
-    brushSizeSlider = new JSlider(JSlider.HORIZONTAL, 3, 30, 3);
+    brushSizeSlider = new JSlider(JSlider.HORIZONTAL, MIN_RADIUS, MAX_RADIUS, DEFAULT_RADIUS);
     brushSizeSlider.setMaximumSize(new Dimension(128, 48));
     brushSizeSlider.addChangeListener(new ChangeListener() {
       @Override public void stateChanged(ChangeEvent e) {
