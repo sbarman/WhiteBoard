@@ -17,13 +17,17 @@ import javax.swing.JColorChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
 import javax.swing.JSlider;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import whiteboard.packet.ChangeBrushColorPacket;
 import whiteboard.packet.ChangeBrushSizePacket;
 import whiteboard.packet.ClearScreenPacket;
+import whiteboard.packet.TextMessagePacket;
 
 public class WhiteBoard {
 
@@ -37,7 +41,14 @@ public class WhiteBoard {
   private JRadioButton eraseButton;
   private DrawingPanel drawingPanel;
   
-  private final Dimension drawingPanelSize = new Dimension(640, 640);
+  public DrawingPanel getDrawingPanel() {
+    return drawingPanel;
+  }
+
+  private JTextField messageField;
+  private JTextArea messageLog;
+  
+  private final Dimension drawingPanelSize = new Dimension(640, 480);
   
   private int radius = DEFAULT_RADIUS;
   public int getRadius() {
@@ -60,6 +71,7 @@ public class WhiteBoard {
   }
   
   private WhiteBoardClient client;
+  private JScrollPane messageLogScrollPane;
   public WhiteBoardClient getClient() {
 	  return client;
   }
@@ -72,13 +84,35 @@ public class WhiteBoard {
     frame = new JFrame();
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     
-    JPanel controlPanel = new JPanel();
-    controlPanel.setLayout(new BoxLayout(controlPanel, BoxLayout.X_AXIS));
-    frame.getContentPane().add(controlPanel, BorderLayout.NORTH);
-    
     drawingPanel = new DrawingPanel(this);
     drawingPanel.setPreferredSize(drawingPanelSize);
     frame.getContentPane().add(drawingPanel, BorderLayout.CENTER);
+    
+    JPanel textPanel = new JPanel();
+    textPanel.setLayout(new BoxLayout(textPanel, BoxLayout.Y_AXIS));
+    frame.getContentPane().add(textPanel, BorderLayout.SOUTH);
+    
+    // textPanel.add(new JSeparator(SwingConstants.HORIZONTAL));
+    
+    messageLog = new JTextArea();
+    messageLog.setRows(6);
+    messageLog.setEditable(false);
+    messageLogScrollPane = new JScrollPane(messageLog);
+    textPanel.add(messageLogScrollPane);
+    
+    messageField = new JTextField();
+    messageField.addActionListener(new ActionListener() {
+      @Override public void actionPerformed(ActionEvent e) {
+        String text = messageField.getText();
+        client.sendCommandPacket(new TextMessagePacket(text));
+        messageField.setText("");
+      }
+    });
+    textPanel.add(messageField);
+    
+    JPanel controlPanel = new JPanel();
+    controlPanel.setLayout(new BoxLayout(controlPanel, BoxLayout.X_AXIS));
+    frame.getContentPane().add(controlPanel, BorderLayout.NORTH);
     
     controlPanel.add(Box.createHorizontalGlue());
     
@@ -160,7 +194,17 @@ public class WhiteBoard {
     frame.pack();
     frame.setResizable(false);
     frame.setVisible(true);
-    client.initListener(this, drawingPanel);
+    client.initListener(this);
+  }
+  
+  public void addMessage(String line) {
+    if (messageLog.getText().isEmpty()) {
+      messageLog.append(line);
+    } else {
+      messageLog.append("\n" + line);
+    }
+    // Scroll to bottom
+    messageLog.setCaretPosition(messageLog.getText().length());
   }
   
   public static void main(String[] args) {

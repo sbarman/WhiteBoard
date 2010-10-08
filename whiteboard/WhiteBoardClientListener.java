@@ -3,7 +3,6 @@ package whiteboard;
 import java.awt.Color;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Vector;
 
@@ -14,6 +13,7 @@ import whiteboard.packet.CursorMovedPacket;
 import whiteboard.packet.DrawImagePacket;
 import whiteboard.packet.DrawLinePacket;
 import whiteboard.packet.Packet;
+import whiteboard.packet.TextMessagePacket;
 
 public class WhiteBoardClientListener extends Thread {
 	
@@ -24,6 +24,7 @@ public class WhiteBoardClientListener extends Thread {
 	// Stores the current state of each client seen
 	private HashMap<Integer, WhiteBoardState> clientStates;
   private int clientId;
+  private WhiteBoard wb;
 	
 	class WhiteBoardState {
 		int brushSize;
@@ -51,10 +52,11 @@ public class WhiteBoardClientListener extends Thread {
 	
 	
 	public WhiteBoardClientListener(ObjectInputStream input,
-			DrawingPanel panel, int clientId) {
+			WhiteBoard wb, int clientId) {
 		this.input = input;
-		this.panel = panel;
+		this.panel = wb.getDrawingPanel();
 		this.clientId = clientId;
+		this.wb = wb;
 		packetHistory = new Vector<Packet>();
 		clientStates = new HashMap<Integer, WhiteBoardState>();
 	}
@@ -120,6 +122,13 @@ public class WhiteBoardClientListener extends Thread {
 			  panel.setRemoteCursor(dlp.getEndPoint(), clientStates.get(id).brushSize);
 			}
 			panel.repaint();
+		} else if(packet instanceof TextMessagePacket) {
+		  TextMessagePacket tmp = (TextMessagePacket) packet;
+		  if (tmp.getScreenId() == clientId) {
+		    wb.addMessage(tmp.getMessage());
+		  } else {
+		    wb.addMessage("> " + tmp.getMessage());
+		  }
 		} else {
 			System.out.println("Unknown packet");
 		}

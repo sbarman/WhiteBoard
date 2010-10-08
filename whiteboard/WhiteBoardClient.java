@@ -1,16 +1,12 @@
 package whiteboard;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.Vector;
 
-import whiteboard.packet.ClearScreenPacket;
 import whiteboard.packet.Packet;
 
 public class WhiteBoardClient {
@@ -58,8 +54,8 @@ public class WhiteBoardClient {
 		}
 	}
 	
-	public void initListener(WhiteBoard board, DrawingPanel panel) {
-		listener = new WhiteBoardClientListener(input, panel, clientId);
+	public void initListener(WhiteBoard board) {
+		listener = new WhiteBoardClientListener(input, board, clientId);
 		listener.start();
 	}
 	
