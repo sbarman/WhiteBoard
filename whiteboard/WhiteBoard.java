@@ -89,6 +89,10 @@ public class WhiteBoard {
   public WhiteBoard() {
 	  this.client = new WhiteBoardClient();
   }
+  
+  public WhiteBoard(String hostName) {
+	  this.client = new WhiteBoardClient(hostName, WhiteBoardClient.DEFAULT_PORT);
+  }
  
   public void run() {
     frame = new JFrame();
@@ -238,7 +242,12 @@ public class WhiteBoard {
   }
   
   public static void main(String[] args) {
-    WhiteBoard wb = new WhiteBoard();
+	WhiteBoard wb;
+	if (args.length == 0) {
+		wb = new WhiteBoard();
+	} else {
+		wb = new WhiteBoard(args[0]);
+	}
     wb.run();
   }
 }
