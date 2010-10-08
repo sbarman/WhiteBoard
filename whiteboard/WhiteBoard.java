@@ -3,6 +3,7 @@ package whiteboard;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -95,6 +96,7 @@ public class WhiteBoard {
     
     drawingPanel = new DrawingPanel(this);
     drawingPanel.setPreferredSize(drawingPanelSize);
+    drawingPanel.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
     frame.getContentPane().add(drawingPanel, BorderLayout.CENTER);
     
     JPanel textPanel = new JPanel();
