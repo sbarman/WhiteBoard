@@ -4,6 +4,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.Shape;
@@ -119,6 +120,10 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
     Shape line = new Line2D.Double(p1, p2);
     imageG2d.setStroke(new BasicStroke(radius * 2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
     imageG2d.draw(line);
+  }
+  
+  public void drawImage(Image image, Point topLeft) {
+    imageG2d.drawImage(image, (int) topLeft.getX(), (int) topLeft.getY(), null);
   }
   
   @Override public void mouseClicked(MouseEvent e) {}

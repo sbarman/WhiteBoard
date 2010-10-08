@@ -5,6 +5,11 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Robot;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -15,6 +20,7 @@ import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
@@ -27,6 +33,7 @@ import javax.swing.event.ChangeListener;
 import whiteboard.packet.ChangeBrushColorPacket;
 import whiteboard.packet.ChangeBrushSizePacket;
 import whiteboard.packet.ClearScreenPacket;
+import whiteboard.packet.DrawImagePacket;
 import whiteboard.packet.TextMessagePacket;
 
 public class WhiteBoard {
@@ -167,6 +174,30 @@ public class WhiteBoard {
       }
     });
     controlPanel.add(brushSizeSlider);
+    
+    JButton screenshotButton = new JButton("Screenshot");
+    screenshotButton.addActionListener(new ActionListener() {
+      @Override public void actionPerformed(ActionEvent e) {
+        try {
+          frame.setVisible(false);
+          Image screenshot = new Robot().createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
+          double panelRatio = drawingPanel.getWidth() / drawingPanel.getHeight();
+          double screenshotRatio = ((double) screenshot.getWidth(null)) / screenshot.getHeight(null);
+          if (panelRatio > screenshotRatio) {
+            screenshot = screenshot.getScaledInstance((int) (screenshotRatio * drawingPanel.getHeight()), (int) drawingPanel.getHeight(), Image.SCALE_SMOOTH);
+            client.sendCommandPacket(new DrawImagePacket(screenshot, new Point((drawingPanel.getWidth() - screenshot.getWidth(null)) / 2, 0)));
+          } else {
+            screenshot = screenshot.getScaledInstance((int) drawingPanel.getWidth(), (int) (drawingPanel.getWidth() / screenshotRatio), Image.SCALE_SMOOTH);
+            client.sendCommandPacket(new DrawImagePacket(screenshot, new Point(0, (drawingPanel.getHeight() - screenshot.getHeight(null)) / 2)));
+          }
+        } catch (Exception e1) {
+          JOptionPane.showMessageDialog(null, "Screenshot failed.");
+        } finally {
+          frame.setVisible(true);
+        }
+      }
+    });
+    controlPanel.add(screenshotButton);
     
     JButton clearButton = new JButton("Clear");
     clearButton.addActionListener(new ActionListener() {

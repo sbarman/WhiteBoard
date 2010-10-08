@@ -105,7 +105,9 @@ public class WhiteBoardClientListener extends Thread {
 			  panel.repaint();
 			}
 		} else if(packet instanceof DrawImagePacket) {
-			
+		  DrawImagePacket dip = (DrawImagePacket) packet;
+			panel.drawImage(dip.getImage(), dip.getTopLeftPos());
+			panel.repaint();
 		} else if(packet instanceof DrawLinePacket) {
 			DrawLinePacket dlp = (DrawLinePacket) packet;
 			Color color;
