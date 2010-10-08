@@ -35,7 +35,7 @@ import whiteboard.packet.ChangeBrushColorPacket;
 import whiteboard.packet.ChangeBrushSizePacket;
 import whiteboard.packet.ClearScreenPacket;
 import whiteboard.packet.DrawImagePacket;
-//import whiteboard.packet.TextMessagePacket;
+import whiteboard.packet.TextMessagePacket;
 
 public class WhiteBoard {
   public static final int DEFAULT_RADIUS = 3;
@@ -117,7 +117,7 @@ public class WhiteBoard {
     messageField.addActionListener(new ActionListener() {
       @Override public void actionPerformed(ActionEvent e) {
         String text = messageField.getText();
-//        client.sendCommandPacket(new TextMessagePacket(text));
+        client.sendCommandPacket(new TextMessagePacket(text));
         messageField.setText("");
       }
     });

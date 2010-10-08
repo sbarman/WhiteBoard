@@ -13,7 +13,7 @@ import whiteboard.packet.CursorMovedPacket;
 import whiteboard.packet.DrawImagePacket;
 import whiteboard.packet.DrawLinePacket;
 import whiteboard.packet.Packet;
-//import whiteboard.packet.TextMessagePacket;
+import whiteboard.packet.TextMessagePacket;
 
 public class WhiteBoardClientListener extends Thread {
 	
@@ -129,15 +129,15 @@ public class WhiteBoardClientListener extends Thread {
 			  panel.setRemoteCursor(dlp.getEndPoint(), clientStates.get(id).brushSize);
 			}
 			panel.repaint();
-//		} else if(packet instanceof TextMessagePacket) {
-//		  TextMessagePacket tmp = (TextMessagePacket) packet;
-//		  if (wb != null) {
-//			  if (tmp.getScreenId() == clientId) {
-//			    wb.addMessage(tmp.getMessage());
-//			  } else {
-//			    wb.addMessage("> " + tmp.getMessage());
-//			  }
-//		  }
+		} else if(packet instanceof TextMessagePacket) {
+		  TextMessagePacket tmp = (TextMessagePacket) packet;
+		  if (wb != null) {
+			  if (tmp.getScreenId() == clientId) {
+			    wb.addMessage(tmp.getMessage());
+			  } else {
+			    wb.addMessage("> " + tmp.getMessage());
+			  }
+		  }
 		} else {
 			System.out.println("Unknown packet");
 		}
