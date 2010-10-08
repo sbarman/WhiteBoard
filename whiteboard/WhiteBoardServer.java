@@ -62,6 +62,7 @@ public class WhiteBoardServer {
 			newPacket.setSeqNum(packets.size());
 			packets.add(newPacket);
 		}
+		newPacket.setTime(System.currentTimeMillis());
 		
 		synchronized(openConnections) {
 			for(WhiteBoardServerThread openConnection : openConnections) {
