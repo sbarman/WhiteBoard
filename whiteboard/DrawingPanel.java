@@ -38,7 +38,9 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
   
   public DrawingPanel(WhiteBoard wb) {
     whiteboard = wb;
-    client = wb.getClient();
+    if (whiteboard != null) {
+    	client = wb.getClient();
+    }
     
     this.addMouseListener(this);
     this.addMouseMotionListener(this);
@@ -95,15 +97,16 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
 //    } else if (whiteboard.isErasing()) {
 //      imageG2d.setColor(Color.WHITE);
 //    }
-    
-    if (lastPoint == null) {
-    	client.sendCommandPacket(new DrawLinePacket(p, p, whiteboard.isErasing()));
-      //imageG2d.fillOval(p.x - radius, p.y - radius, radius * 2, radius * 2);
-    } else {
-    	client.sendCommandPacket(new DrawLinePacket(lastPoint, p, whiteboard.isErasing()));
-//      Shape line = new Line2D.Double(lastPoint, p);
-//      imageG2d.setStroke(new BasicStroke(radius * 2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-//      imageG2d.draw(line);
+    if (client != null) {
+	    if (lastPoint == null) {
+	    	client.sendCommandPacket(new DrawLinePacket(p, p, whiteboard.isErasing()));
+	      //imageG2d.fillOval(p.x - radius, p.y - radius, radius * 2, radius * 2);
+	    } else {
+	    	client.sendCommandPacket(new DrawLinePacket(lastPoint, p, whiteboard.isErasing()));
+	//      Shape line = new Line2D.Double(lastPoint, p);
+	//      imageG2d.setStroke(new BasicStroke(radius * 2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+	//      imageG2d.draw(line);
+	    }
     }
     
     lastPoint = p;
@@ -129,25 +132,30 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
   @Override public void mouseClicked(MouseEvent e) {}
   @Override public void mouseEntered(MouseEvent e) {}
   @Override public void mouseExited(MouseEvent e) {
-    if (lastPoint != null) {
-      this.sendDrawPacket(e.getPoint());
-    } else {
-      client.sendCommandPacket(new CursorMovedPacket(null));
+    if (client != null) {
+		if (lastPoint != null) {
+	      this.sendDrawPacket(e.getPoint());
+	    } else {
+	      client.sendCommandPacket(new CursorMovedPacket(null));
+	    }
+	    lastPoint = null;
     }
-    lastPoint = null;
   }
   @Override public void mousePressed(MouseEvent e) {
-    this.sendDrawPacket(e.getPoint());
+    if (client != null)
+	  this.sendDrawPacket(e.getPoint());
   }
   @Override public void mouseReleased(MouseEvent e) {
     lastPoint = null;
   }
 
   @Override public void mouseDragged(MouseEvent e) {
-    this.sendDrawPacket(e.getPoint());
+    if (client != null)
+    	this.sendDrawPacket(e.getPoint());
   }
   
   @Override public void mouseMoved(MouseEvent e) {
-	  client.sendCommandPacket(new CursorMovedPacket(e.getPoint()));
+	  if (client != null)
+		  client.sendCommandPacket(new CursorMovedPacket(e.getPoint()));
   }
 }

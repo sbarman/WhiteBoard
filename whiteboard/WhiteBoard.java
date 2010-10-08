@@ -35,7 +35,7 @@ import whiteboard.packet.ChangeBrushColorPacket;
 import whiteboard.packet.ChangeBrushSizePacket;
 import whiteboard.packet.ClearScreenPacket;
 import whiteboard.packet.DrawImagePacket;
-import whiteboard.packet.TextMessagePacket;
+//import whiteboard.packet.TextMessagePacket;
 
 public class WhiteBoard {
   public static final int DEFAULT_RADIUS = 3;
@@ -113,7 +113,7 @@ public class WhiteBoard {
     messageField.addActionListener(new ActionListener() {
       @Override public void actionPerformed(ActionEvent e) {
         String text = messageField.getText();
-        client.sendCommandPacket(new TextMessagePacket(text));
+//        client.sendCommandPacket(new TextMessagePacket(text));
         messageField.setText("");
       }
     });
@@ -213,11 +213,8 @@ public class WhiteBoard {
     JButton historyButton = new JButton("Replay");
     historyButton.addActionListener(new ActionListener() {
         @Override public void actionPerformed(ActionEvent e) {
-        	JFrame replayFrame = new JFrame();
-            
-            DrawingPanel replayDrawingPanel = new DrawingPanel(null);
-            replayDrawingPanel.setPreferredSize(drawingPanelSize);
-            replayFrame.getContentPane().add(replayDrawingPanel, BorderLayout.CENTER);
+        	ReplayThread thread = new ReplayThread(drawingPanelSize, client);
+        	thread.start();
         }
       });
     controlPanel.add(historyButton);

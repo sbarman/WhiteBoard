@@ -13,18 +13,20 @@ import whiteboard.packet.CursorMovedPacket;
 import whiteboard.packet.DrawImagePacket;
 import whiteboard.packet.DrawLinePacket;
 import whiteboard.packet.Packet;
-import whiteboard.packet.TextMessagePacket;
+//import whiteboard.packet.TextMessagePacket;
 
 public class WhiteBoardClientListener extends Thread {
 	
 	private ObjectInputStream input;
 	private DrawingPanel panel;
 	private Vector<Packet> packetHistory;
+	private WhiteBoard wb;
 	
 	// Stores the current state of each client seen
 	private HashMap<Integer, WhiteBoardState> clientStates;
-  private int clientId;
-  private WhiteBoard wb;
+    private int clientId;
+    
+    boolean running;
 	
 	class WhiteBoardState {
 		int brushSize;
@@ -51,19 +53,20 @@ public class WhiteBoardClientListener extends Thread {
 	}
 	
 	
-	public WhiteBoardClientListener(ObjectInputStream input,
-			WhiteBoard wb, int clientId) {
+	public WhiteBoardClientListener(ObjectInputStream input, WhiteBoard wb,
+			DrawingPanel drawingPanel, int clientId) {
 		this.input = input;
-		this.panel = wb.getDrawingPanel();
-		this.clientId = clientId;
 		this.wb = wb;
+		this.panel = drawingPanel;
+		this.clientId = clientId;
+		running = true;
 		packetHistory = new Vector<Packet>();
 		clientStates = new HashMap<Integer, WhiteBoardState>();
 	}
 	
 	public void run() {
 		System.out.println("Starting listener.");
-		while(true) {
+		while(running) {
 			try {
 				Object o = input.readObject();
 				if (o instanceof Packet) {
@@ -73,13 +76,15 @@ public class WhiteBoardClientListener extends Thread {
 					packetHistory.add(packet);
 				}
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				running = false;
 			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				running = false;
 			}
 		}
+	}
+	
+	public void stopThread() {
+		running = false;
 	}
 	
 	public Vector<Packet> getPacketHistory() {
@@ -124,13 +129,15 @@ public class WhiteBoardClientListener extends Thread {
 			  panel.setRemoteCursor(dlp.getEndPoint(), clientStates.get(id).brushSize);
 			}
 			panel.repaint();
-		} else if(packet instanceof TextMessagePacket) {
-		  TextMessagePacket tmp = (TextMessagePacket) packet;
-		  if (tmp.getScreenId() == clientId) {
-		    wb.addMessage(tmp.getMessage());
-		  } else {
-		    wb.addMessage("> " + tmp.getMessage());
-		  }
+//		} else if(packet instanceof TextMessagePacket) {
+//		  TextMessagePacket tmp = (TextMessagePacket) packet;
+//		  if (wb != null) {
+//			  if (tmp.getScreenId() == clientId) {
+//			    wb.addMessage(tmp.getMessage());
+//			  } else {
+//			    wb.addMessage("> " + tmp.getMessage());
+//			  }
+//		  }
 		} else {
 			System.out.println("Unknown packet");
 		}
