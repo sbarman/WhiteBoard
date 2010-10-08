@@ -181,7 +181,7 @@ public class WhiteBoard {
     screenshotButton.addActionListener(new ActionListener() {
       @Override public void actionPerformed(ActionEvent e) {
         try {
-          frame.setVisible(false);
+          while (frame.isVisible()) frame.setVisible(false);
           Image screenshot = new Robot().createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
           double panelRatio = drawingPanel.getWidth() / drawingPanel.getHeight();
           double screenshotRatio = ((double) screenshot.getWidth(null)) / screenshot.getHeight(null);
